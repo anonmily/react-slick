@@ -6,7 +6,7 @@ import {getTrackCSS, getTrackLeft, getTrackAnimateCSS} from './trackHelper';
 import assign from 'object-assign';
 
 var helpers = {
-  initialize: function (props) {
+  initializeSliderState: function(props, callback){
     const slickList = ReactDOM.findDOMNode(this.list);
 
     var slideCount = React.Children.count(props.children);
@@ -34,8 +34,10 @@ var helpers = {
       currentSlide,
       slideHeight,
       listHeight,
-    }, function () {
-
+    }, callback)
+  },
+  initialize: function (props) {
+    this.initializeSliderState(props, function () {
       var targetLeft = getTrackLeft(assign({
         slideIndex: this.state.currentSlide,
         trackRef: this.track
@@ -49,37 +51,12 @@ var helpers = {
     });
   },
   update: function (props) {
-    const slickList = ReactDOM.findDOMNode(this.list);
-    // This method has mostly same code as initialize method.
-    // Refactor it
-    var slideCount = React.Children.count(props.children);
-    var listWidth = this.getWidth(slickList);
-    var trackWidth = this.getWidth(ReactDOM.findDOMNode(this.track));
-    var slideWidth;
-
-    if (!props.vertical) {
-      var centerPaddingAdj = props.centerMode && (parseInt(props.centerPadding) * 2);
-      slideWidth = (this.getWidth(ReactDOM.findDOMNode(this)) - centerPaddingAdj)/props.slidesToShow;
-    } else {
-      slideWidth = this.getWidth(ReactDOM.findDOMNode(this));
+    // pause slider if autoplay is set to false
+    if(!props.autoplay){
+      this.pause();
     }
 
-    const slideHeight = this.getHeight(slickList.querySelector('[data-index="0"]'));
-    const listHeight = slideHeight * props.slidesToShow;
-
-    // pause slider if autoplay is set to false
-    if(!props.autoplay)
-      this.pause();
-
-    this.setState({
-      slideCount,
-      slideWidth,
-      listWidth,
-      trackWidth,
-      slideHeight,
-      listHeight,
-    }, function () {
-
+    this.initializeSliderState(props, function () {
       var targetLeft = getTrackLeft(assign({
         slideIndex: this.state.currentSlide,
         trackRef: this.track
@@ -93,7 +70,7 @@ var helpers = {
   getWidth: function getWidth(elem) {
     return elem.getBoundingClientRect().width || elem.offsetWidth;
   },
-  getHeight(elem) {
+  getHeight: function(elem) {
     return elem.getBoundingClientRect().height || elem.offsetHeight;
   },
   adaptHeight: function () {
