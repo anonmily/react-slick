@@ -1095,7 +1095,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var helpers = {
-	  initialize: function initialize(props) {
+	  initializeSliderState: function initializeSliderState(props, callback) {
 	    var slickList = _reactDom2.default.findDOMNode(this.list);
 
 	    var slideCount = _react2.default.Children.count(props.children);
@@ -1123,8 +1123,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      currentSlide: currentSlide,
 	      slideHeight: slideHeight,
 	      listHeight: listHeight
-	    }, function () {
-
+	    }, callback);
+	  },
+	  initialize: function initialize(props) {
+	    this.initializeSliderState(props, function () {
 	      var targetLeft = (0, _trackHelper.getTrackLeft)((0, _objectAssign2.default)({
 	        slideIndex: this.state.currentSlide,
 	        trackRef: this.track
@@ -1138,36 +1140,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  },
 	  update: function update(props) {
-	    var slickList = _reactDom2.default.findDOMNode(this.list);
-	    // This method has mostly same code as initialize method.
-	    // Refactor it
-	    var slideCount = _react2.default.Children.count(props.children);
-	    var listWidth = this.getWidth(slickList);
-	    var trackWidth = this.getWidth(_reactDom2.default.findDOMNode(this.track));
-	    var slideWidth;
-
-	    if (!props.vertical) {
-	      var centerPaddingAdj = props.centerMode && parseInt(props.centerPadding) * 2;
-	      slideWidth = (this.getWidth(_reactDom2.default.findDOMNode(this)) - centerPaddingAdj) / props.slidesToShow;
-	    } else {
-	      slideWidth = this.getWidth(_reactDom2.default.findDOMNode(this));
+	    // pause slider if autoplay is set to false
+	    if (!props.autoplay) {
+	      this.pause();
 	    }
 
-	    var slideHeight = this.getHeight(slickList.querySelector('[data-index="0"]'));
-	    var listHeight = slideHeight * props.slidesToShow;
-
-	    // pause slider if autoplay is set to false
-	    if (!props.autoplay) this.pause();
-
-	    this.setState({
-	      slideCount: slideCount,
-	      slideWidth: slideWidth,
-	      listWidth: listWidth,
-	      trackWidth: trackWidth,
-	      slideHeight: slideHeight,
-	      listHeight: listHeight
-	    }, function () {
-
+	    this.initializeSliderState(props, function () {
 	      var targetLeft = (0, _trackHelper.getTrackLeft)((0, _objectAssign2.default)({
 	        slideIndex: this.state.currentSlide,
 	        trackRef: this.track
@@ -1184,7 +1162,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getHeight: function getHeight(elem) {
 	    return elem.getBoundingClientRect().height || elem.offsetHeight;
 	  },
-
 	  adaptHeight: function adaptHeight() {
 	    if (this.props.adaptiveHeight) {
 	      var selector = '[data-index="' + this.state.currentSlide + '"]';

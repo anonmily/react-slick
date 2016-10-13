@@ -70,7 +70,7 @@ var helpers = {
   getWidth: function getWidth(elem) {
     return elem.getBoundingClientRect().width || elem.offsetWidth;
   },
-  getHeight: function(elem) {
+  getHeight: function getHeight(elem) {
     return elem.getBoundingClientRect().height || elem.offsetHeight;
   },
   adaptHeight: function () {

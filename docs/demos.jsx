@@ -6,6 +6,7 @@ import Slider from '../src/slider';
 import SimpleSlider from '../examples/SimpleSlider'
 import SlideChangeHooks from '../examples/SlideChangeHooks'
 import MultipleItems from '../examples/MultipleItems'
+import MultipleItemsDynamic from '../examples/MultipleItemsDynamic'
 import Responsive from '../examples/Responsive'
 import UnevenSetsInfinite from '../examples/UnevenSetsInfinite'
 import UnevenSetsFinite from '../examples/UnevenSetsFinite'
@@ -33,6 +34,7 @@ export default class App extends React.Component {
       <div className='content'>
         <SimpleSlider />
         <MultipleItems />
+        <MultipleItemsDynamic />
         <Responsive />
         <UnevenSetsInfinite />
         <UnevenSetsFinite />
