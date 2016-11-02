@@ -1,6 +1,7 @@
 'use strict';
 
 var gulp = require('gulp');
+var net = require('net');
 var del = require('del');
 var sass = require('gulp-sass');
 var webpack = require('webpack');
@@ -36,26 +37,41 @@ gulp.task('watch', ['copy', 'sass'], function () {
   gulp.watch(['./docs/index.html'], ['copy']);
 });
 
+function findPort(port, cb){
+  var s;
+  s = net.createServer().listen(port, "0.0.0.0");
+  s.on('listening', function() {
+    s.close();
+    return cb(port);
+  });
+  return s.on('error', function(err) {
+    return findPort(port + 1, cb);
+  })
+}
+
+var devConfig = require('./webpack.config');
+devConfig.plugins = devConfig.plugins.concat(
+  new webpack.DefinePlugin({
+    'process.env': {
+      'NODE_ENV': JSON.stringify('dev_docs')
+    }
+  })
+);
 gulp.task('server', ['copy', 'sass'], function (callback) {
-  var myConfig = require('./webpack.config');
-  myConfig.plugins = myConfig.plugins.concat(
-    new webpack.DefinePlugin({
-      'process.env': {
-        'NODE_ENV': JSON.stringify('dev_docs')
+  findPort(8080, function(port){
+    return new WebpackDevServer(webpack(devConfig), {
+      contentBase: './build',
+      hot: true,
+      debug: true
+    }).listen(port, '0.0.0.0', function (err, result) {
+      if (err) {
+        console.log(err);
+      }else{
+        console.log('Dev server listening on port ' + port);
       }
     })
-  );
-
-  new WebpackDevServer(webpack(myConfig), {
-    contentBase: './build',
-    hot: true,
-    debug: true
-  }).listen(8080, '0.0.0.0', function (err, result) {
-    if (err) {
-      console.log(err);
-    }
-  });
-  callback();
+    callback();
+  })
 });
 
 
